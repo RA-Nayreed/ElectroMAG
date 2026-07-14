@@ -30,7 +30,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-For the Vercel deployment, run the same Docker composition on a publicly reachable Docker host and set `VITE_STACK_API_URL` to its HTTPS URL in the Vercel project settings. The browser sends machine-gradable responses directly to `/grade` and displays a `STACK assessed` marker after a successful response.
+The production STACK backend runs on CSC Rahti while the frontend remains on Vercel. Follow [the Rahti deployment guide](stack/RAHTI.md), then set `VITE_STACK_API_URL` to the generated Rahti HTTPS Route in the Vercel project settings. The browser sends machine-gradable responses directly to `/grade` and displays a `STACK assessed` marker after a successful response.
 
 ## Validation
 
