@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: maxima
-          image: mathinstitut/goemaxima:2026062900-latest
+          image: mathinstitut/goemaxima:2026042200-latest
           imagePullPolicy: IfNotPresent
           env:
             - name: GOEMAXIMA_PROCESS_ISOLATION
@@ -106,7 +106,7 @@ spec:
     spec:
       containers:
         - name: stack-api
-          image: stackmaths/stackapi:2026062900-latest
+          image: stackmaths/stackapi:2026042200-latest
           imagePullPolicy: IfNotPresent
           workingDir: /srv/stack/api/public
           command:
