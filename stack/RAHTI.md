@@ -1,15 +1,22 @@
 # Deploying STACK on CSC Rahti
 
-The ElectroMAG frontend remains on Vercel. Rahti runs only the STACK API and its private GoMaxima service.
+The ElectroMAG frontend remains on Vercel. Rahti runs only the STACK API and its private GoMaxima service. GoMaxima uses a small compatibility build so its documented non-root mode works with Rahti's high container user IDs.
+
+## Build the Rahti-compatible GoMaxima image
+
+Import `stack/rahti-build.yaml` through the Rahti web console before importing the application manifest. This creates an internal ImageStream and a BuildConfig. The initial build starts automatically and publishes `goemaxima-rahti:2026042200` inside the `electromag` project.
+
+Wait for **Builds > Builds > goemaxima-rahti-1** to show `Complete` before deploying or updating the Maxima Deployment.
 
 ## Deploy through the Rahti web console
 
 1. Open the `electromag` project in the Rahti console.
-2. Select the plus icon in the top navigation and choose **Import YAML**.
-3. Paste the complete contents of `stack/rahti.yaml` into the editor.
-4. Select **Create**.
-5. Open **Workloads > Pods** and wait until both `maxima` and `stack-api` show `Running` and `Ready`.
-6. Open **Networking > Routes** and copy the HTTPS location for `stack-api`.
+2. Confirm that the Rahti-compatible GoMaxima build is complete.
+3. Select the plus icon in the top navigation and choose **Import YAML**.
+4. Paste the complete contents of `stack/rahti.yaml` into the editor.
+5. Select **Create**.
+6. Open **Workloads > Pods** and wait until both `maxima` and `stack-api` show `Running` and `Ready`.
+7. Open **Networking > Routes** and copy the HTTPS location for `stack-api`.
 
 ## Deploy with the command line
 
@@ -46,4 +53,3 @@ oc logs deployment/stack-api --tail=100
 ```
 
 GoMaxima has no public Route. It is reachable only inside the Rahti project through the `maxima` service.
-
