@@ -6,8 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "stack:up": "docker compose -f stack/docker-compose.yml up -d",
-    "stack:down": "docker compose -f stack/docker-compose.yml down",
     "test": "vitest run",
     "test:watch": "vitest"
   },
