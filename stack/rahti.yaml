@@ -51,7 +51,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             limits:
-              cpu: "1"
+              cpu: 500m
               memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
@@ -143,7 +143,7 @@ spec:
               cpu: 100m
               memory: 256Mi
             limits:
-              cpu: "1"
+              cpu: 500m
               memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
@@ -189,4 +189,3 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
-
