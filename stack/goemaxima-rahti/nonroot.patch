@@ -1,0 +1,83 @@
+diff --git a/src/web/drop_privilege_linux.go b/src/web/drop_privilege_linux.go
+index 7c01e0d..67f1a1c 100644
+--- a/src/web/drop_privilege_linux.go
++++ b/src/web/drop_privilege_linux.go
+@@ -19,20 +19,20 @@ import (
+ const goemaxima_nobody string = "goemaxima-nobody"
+ 
+ type PrivilegeDropper struct {
+-	server_uid       uint16
+-	server_gid       uint16
+-	nobody_uid       uint16
+-	nobody_gid       uint16
++	server_uid       int
++	server_gid       int
++	nobody_uid       int
++	nobody_gid       int
+ 	execution_getter <-chan ExecutionInfo
+ }
+ 
+ type ExecutionInfo struct {
+-	Uid uint16
+-	Gid uint16
++	Uid int
++	Gid int
+ 	F   func(error)
+ }
+ 
+-func (dropper *PrivilegeDropper) thread_drop_euid(uid uint16) error {
++func (dropper *PrivilegeDropper) thread_drop_euid(uid int) error {
+ 	// These functions use the raw syscall interface since unix/posix usually regards setresuid to set the UIDs of the whole process
+ 	// (usually implemented through some signal handlers) but we absolutely don't want that.
+ 	_, _, errno := unix.Syscall(unix.SYS_SETRESUID, uintptr(dropper.nobody_uid), uintptr(uid), uintptr(dropper.server_uid))
+@@ -50,7 +50,7 @@ func (dropper *PrivilegeDropper) thread_restore_euid() {
+ 	}
+ }
+ 
+-func (dropper *PrivilegeDropper) thread_drop_egid(gid uint16) error {
++func (dropper *PrivilegeDropper) thread_drop_egid(gid int) error {
+ 	_, _, errno := unix.Syscall(unix.SYS_SETRESGID, uintptr(dropper.nobody_gid), uintptr(gid), uintptr(dropper.server_gid))
+ 	if errno != 0 {
+ 		return errno
+@@ -65,7 +65,7 @@ func (dropper *PrivilegeDropper) thread_restore_egid() {
+ 	}
+ }
+ 
+-func (dropper *PrivilegeDropper) run_as_user(uid, gid uint16, f func(error)) {
++func (dropper *PrivilegeDropper) run_as_user(uid, gid int, f func(error)) {
+ 	if err := dropper.thread_drop_egid(gid); err != nil {
+ 		f(err)
+ 		return
+@@ -135,10 +135,10 @@ func StartDropper(execution_channel chan ExecutionInfo, process_isolation bool)
+ 	}
+ 
+ 	dropper := PrivilegeDropper{
+-		server_uid:       uint16(server_uid),
+-		server_gid:       uint16(server_gid),
+-		nobody_uid:       uint16(nobody_uid),
+-		nobody_gid:       uint16(nobody_gid),
++		server_uid:       server_uid,
++		server_gid:       server_gid,
++		nobody_uid:       nobody_uid,
++		nobody_gid:       nobody_gid,
+ 		execution_getter: execution_channel,
+ 	}
+ 
+diff --git a/src/web/web.go b/src/web/web.go
+index 12f2835..60913f2 100644
+--- a/src/web/web.go
++++ b/src/web/web.go
+@@ -42,11 +42,9 @@ type User struct {
+ }
+ 
+ func (user *User) go_execute_as(f func(error)) {
+-	uid16 := uint16(user.Uid)
+-	gid16 := uint16(user.Gid)
+ 	privilege_drop_channel <- ExecutionInfo{
+-		Uid: uid16,
+-		Gid: gid16,
++		Uid: user.Uid,
++		Gid: user.Gid,
+ 		F:   f,
+ 	}
+ }
