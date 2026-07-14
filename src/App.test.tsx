@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { App } from './App'
@@ -43,7 +43,7 @@ describe('practice evidence', () => {
     }
   ]
 
-  it('records a correct result and completes the bank', async () => {
+  it('records a correct result and completes the bank', () => {
     const onAttempt = vi.fn()
     const onComplete = vi.fn()
     render(<PracticeBank questions={questions} onAttempt={onAttempt} onComplete={onComplete} />)
@@ -51,7 +51,7 @@ describe('practice evidence', () => {
     fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '7' } })
     fireEvent.click(screen.getByRole('button', { name: 'Check answer' }))
 
-    await waitFor(() => expect(screen.getByText(/Correct. Explain why/)).toBeInTheDocument())
+    expect(screen.getByText(/Correct. Explain why/)).toBeInTheDocument()
     expect(onAttempt).toHaveBeenCalledOnce()
     expect(onComplete).toHaveBeenCalledOnce()
   })
