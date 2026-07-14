@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import { gradeLocally, gradeWithStack } from '../lib/stack'
 import type { PracticeQuestion } from '../types/learning'
 
 interface PracticeBankProps {
@@ -10,16 +9,12 @@ interface PracticeBankProps {
 }
 
 type QuestionState = 'idle' | 'correct' | 'incorrect' | 'reviewed'
-type GradingSource = 'stack' | 'local'
 
 export function PracticeBank({ questions, onAttempt, onComplete }: PracticeBankProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [states, setStates] = useState<Record<string, QuestionState>>({})
   const [visibleHints, setVisibleHints] = useState<string[]>([])
   const [visibleSolutions, setVisibleSolutions] = useState<string[]>([])
-  const [gradingIds, setGradingIds] = useState<string[]>([])
-  const [gradingSources, setGradingSources] = useState<Record<string, GradingSource>>({})
-  const [gradingMessages, setGradingMessages] = useState<Record<string, string>>({})
 
   function recordState(questionId: string, nextState: QuestionState) {
     setStates((currentStates) => {
@@ -37,35 +32,18 @@ export function PracticeBank({ questions, onAttempt, onComplete }: PracticeBankP
     })
   }
 
-  async function checkQuestion(question: PracticeQuestion) {
+  function checkQuestion(question: PracticeQuestion) {
     onAttempt()
 
-    if (question.type === 'explain') {
+    if (question.type === 'choice') {
+      recordState(question.id, answers[question.id] === question.answer ? 'correct' : 'incorrect')
       return
     }
 
-    const answer = answers[question.id] ?? ''
-    setGradingIds((currentIds) => [...currentIds, question.id])
-    setGradingMessages((currentMessages) => ({ ...currentMessages, [question.id]: '' }))
-
-    try {
-      const result = await gradeWithStack(question, answer)
-      setGradingSources((currentSources) => ({ ...currentSources, [question.id]: 'stack' }))
-
-      if (!result.isGradable) {
-        setGradingMessages((currentMessages) => ({
-          ...currentMessages,
-          [question.id]: 'The response could not be interpreted. Check its form and try again.'
-        }))
-      }
-
-      recordState(question.id, result.isCorrect ? 'correct' : 'incorrect')
-    } catch {
-      const isCorrect = gradeLocally(question, answer)
-      setGradingSources((currentSources) => ({ ...currentSources, [question.id]: 'local' }))
+    if (question.type === 'number') {
+      const enteredValue = Number(answers[question.id])
+      const isCorrect = Number.isFinite(enteredValue) && Math.abs(enteredValue - question.answer) <= question.tolerance
       recordState(question.id, isCorrect ? 'correct' : 'incorrect')
-    } finally {
-      setGradingIds((currentIds) => currentIds.filter((id) => id !== question.id))
     }
   }
 
@@ -95,18 +73,12 @@ export function PracticeBank({ questions, onAttempt, onComplete }: PracticeBankP
           const state = states[question.id] ?? 'idle'
           const isHintVisible = visibleHints.includes(question.id)
           const isSolutionVisible = visibleSolutions.includes(question.id)
-          const isGrading = gradingIds.includes(question.id)
-          const gradingSource = gradingSources[question.id]
-          const gradingMessage = gradingMessages[question.id]
 
           return (
             <article className={`practice-question practice-question--${state}`} key={question.id}>
               <div className="practice-question__number">{String(index + 1).padStart(2, '0')}</div>
               <div className="practice-question__body">
-                <div className="practice-question__heading">
-                  <h3>{question.prompt}</h3>
-                  {gradingSource === 'stack' && <span className="stack-badge">STACK assessed</span>}
-                </div>
+                <h3>{question.prompt}</h3>
 
                 {question.type === 'choice' && (
                   <div className="choice-grid">
@@ -117,8 +89,6 @@ export function PracticeBank({ questions, onAttempt, onComplete }: PracticeBankP
                           name={question.id}
                           onChange={() => {
                             setAnswers((currentAnswers) => ({ ...currentAnswers, [question.id]: option }))
-                            setGradingSources((currentSources) => ({ ...currentSources, [question.id]: 'local' }))
-                            setGradingMessages((currentMessages) => ({ ...currentMessages, [question.id]: '' }))
                             recordState(question.id, 'idle')
                           }}
                           type="radio"
@@ -136,8 +106,6 @@ export function PracticeBank({ questions, onAttempt, onComplete }: PracticeBankP
                       inputMode="decimal"
                       onChange={(event) => {
                         setAnswers((currentAnswers) => ({ ...currentAnswers, [question.id]: event.target.value }))
-                        setGradingSources((currentSources) => ({ ...currentSources, [question.id]: 'local' }))
-                        setGradingMessages((currentMessages) => ({ ...currentMessages, [question.id]: '' }))
                         recordState(question.id, 'idle')
                       }}
                       type="number"
@@ -157,8 +125,8 @@ export function PracticeBank({ questions, onAttempt, onComplete }: PracticeBankP
 
                 <div className="practice-actions">
                   {question.type !== 'explain' && (
-                    <button className="button button--primary" disabled={isGrading} onClick={() => void checkQuestion(question)} type="button">
-                      {isGrading ? 'Assessing response' : 'Check answer'}
+                    <button className="button button--primary" onClick={() => checkQuestion(question)} type="button">
+                      Check answer
                     </button>
                   )}
                   {question.type !== 'explain' && (
@@ -181,7 +149,6 @@ export function PracticeBank({ questions, onAttempt, onComplete }: PracticeBankP
 
                 {isHintVisible && question.type !== 'explain' && <p className="answer-note answer-note--hint">{question.hint}</p>}
                 {isSolutionVisible && <p className="answer-note answer-note--solution">{question.solution}</p>}
-                {gradingMessage && <p className="answer-note answer-note--incorrect">{gradingMessage}</p>}
                 {state === 'correct' && <p className="answer-note answer-note--correct">Correct. Explain why it is correct before moving on.</p>}
                 {state === 'incorrect' && <p className="answer-note answer-note--incorrect">Not yet. Use the hint or inspect your sign, direction, units and assumptions.</p>}
 
