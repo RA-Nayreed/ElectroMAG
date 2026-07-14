@@ -18,6 +18,20 @@ npm install
 npm run dev
 ```
 
+## STACK assessment
+
+Quantitative practice uses the standalone STACK API when it is available. The question definitions are intentionally public because this project is a personal self-study tool. If the API cannot be reached, the interface keeps working with its local numerical check.
+
+Start the official STACK API and goemaxima images:
+
+```bash
+npm run stack:up
+cp .env.example .env.local
+npm run dev
+```
+
+For the Vercel deployment, run the same Docker composition on a publicly reachable Docker host and set `VITE_STACK_API_URL` to its HTTPS URL in the Vercel project settings. The browser sends machine-gradable responses directly to `/grade` and displays a `STACK assessed` marker after a successful response.
+
 ## Validation
 
 ```bash
