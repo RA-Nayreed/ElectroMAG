@@ -1,0 +1,192 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maxima
+  namespace: electromag
+  labels:
+    app.kubernetes.io/name: maxima
+    app.kubernetes.io/part-of: electromag-stack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: maxima
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: maxima
+        app.kubernetes.io/part-of: electromag-stack
+    spec:
+      containers:
+        - name: maxima
+          image: mathinstitut/goemaxima:2026062900-latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GOEMAXIMA_PROCESS_ISOLATION
+              value: none
+            - name: GOEMAXIMA_NUSER
+              value: "4"
+            - name: GOEMAXIMA_QUEUE_LEN
+              value: "2"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+          volumeMounts:
+            - name: maxima-temp
+              mountPath: /tmp
+      volumes:
+        - name: maxima-temp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maxima
+  namespace: electromag
+  labels:
+    app.kubernetes.io/name: maxima
+    app.kubernetes.io/part-of: electromag-stack
+spec:
+  selector:
+    app.kubernetes.io/name: maxima
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stack-api
+  namespace: electromag
+  labels:
+    app.kubernetes.io/name: stack-api
+    app.kubernetes.io/part-of: electromag-stack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stack-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stack-api
+        app.kubernetes.io/part-of: electromag-stack
+    spec:
+      containers:
+        - name: stack-api
+          image: stackmaths/stackapi:2026062900-latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /srv/stack/api/public
+          command:
+            - php
+          args:
+            - -S
+            - 0.0.0.0:8080
+            - -t
+            - /srv/stack/api/public
+            - /srv/stack/api/public/index.php
+          env:
+            - name: MAXIMA_URL
+              value: http://maxima:8080/maxima
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stack-api
+  namespace: electromag
+  labels:
+    app.kubernetes.io/name: stack-api
+    app.kubernetes.io/part-of: electromag-stack
+spec:
+  selector:
+    app.kubernetes.io/name: stack-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: stack-api
+  namespace: electromag
+  labels:
+    app.kubernetes.io/name: stack-api
+    app.kubernetes.io/part-of: electromag-stack
+  annotations:
+    haproxy.router.openshift.io/timeout: 30s
+spec:
+  to:
+    kind: Service
+    name: stack-api
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
