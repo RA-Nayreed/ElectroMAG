@@ -15,7 +15,6 @@ export function CurriculumSidebar({
     <aside className="curriculum" aria-label="Course curriculum">
       <div className="curriculum__heading">
         <span className="eyebrow">Course map</span>
-        <strong>L0 + L1</strong>
       </div>
       <nav>
         {curriculum.map((lecture) => (
@@ -30,15 +29,13 @@ export function CurriculumSidebar({
             <ol className="topic-list">
               {lecture.topics.map((topic, topicIndex) => {
                 const isComplete = completedTopicIds.includes(topic.id)
-                const isAvailable = topic.status === 'available'
                 const isCurrent = currentTopicId === topic.id
 
                 return (
                   <li key={topic.id}>
                     <button
                       aria-current={isCurrent ? 'page' : undefined}
-                      className={`topic-link ${isAvailable ? 'topic-link--available' : ''} ${isCurrent ? 'topic-link--active' : ''}`}
-                      disabled={!isAvailable}
+                      className={`topic-link topic-link--available ${isCurrent ? 'topic-link--active' : ''}`}
                       onClick={() => onSelectTopic(topic.id)}
                       type="button"
                     >
@@ -47,9 +44,7 @@ export function CurriculumSidebar({
                       </span>
                       <span>
                         <strong>{topic.title}</strong>
-                        <small>
-                          {isAvailable ? `${topic.estimatedMinutes} min` : 'Upcoming'}
-                        </small>
+                        <small>{topic.summary}</small>
                       </span>
                     </button>
                   </li>
