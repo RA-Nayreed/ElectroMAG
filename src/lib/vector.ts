@@ -37,3 +37,15 @@ export function areVectorsClose(
     Math.abs(actual.z - expected.z) <= tolerance
   )
 }
+
+export function calculateDotProduct(vectorA: Vector3, vectorB: Vector3): number {
+  return vectorA.x * vectorB.x + vectorA.y * vectorB.y + vectorA.z * vectorB.z
+}
+
+export function calculateCrossProduct(vectorA: Vector3, vectorB: Vector3): Vector3 {
+  return {
+    x: vectorA.y * vectorB.z - vectorA.z * vectorB.y,
+    y: vectorA.z * vectorB.x - vectorA.x * vectorB.z,
+    z: vectorA.x * vectorB.y - vectorA.y * vectorB.x
+  }
+}

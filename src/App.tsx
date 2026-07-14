@@ -1,12 +1,39 @@
 import { CurriculumSidebar } from './components/CurriculumSidebar'
 import { ProgressPanel } from './components/ProgressPanel'
 import { VectorLesson } from './components/VectorLesson'
-import { curriculum, availableTopicId } from './data/curriculum'
+import { VectorProductsLesson } from './components/VectorProductsLesson'
+import { curriculum } from './data/curriculum'
 import { useProgress } from './hooks/useProgress'
 
 export function App() {
-  const { progress, recordPracticeAttempt, completeTopic, resetProgress } = useProgress()
+  const {
+    progress,
+    selectTopic,
+    recordPracticeAttempt,
+    completeTopic,
+    resetProgress
+  } = useProgress()
   const totalTopics = curriculum.reduce((total, lecture) => total + lecture.topics.length, 0)
+
+  function renderCurrentLesson() {
+    if (progress.currentTopicId === 'l0-vector-products') {
+      return (
+        <VectorProductsLesson
+          isComplete={progress.completedTopicIds.includes('l0-vector-products')}
+          onComplete={() => completeTopic('l0-vector-products')}
+          onPracticeAttempt={recordPracticeAttempt}
+        />
+      )
+    }
+
+    return (
+      <VectorLesson
+        isComplete={progress.completedTopicIds.includes('l0-vector-foundations')}
+        onComplete={() => completeTopic('l0-vector-foundations')}
+        onPracticeAttempt={recordPracticeAttempt}
+      />
+    )
+  }
 
   return (
     <div className="app-shell">
@@ -20,18 +47,22 @@ export function App() {
           <span className="topbar__divider" />
           <span>L0 + L1</span>
         </div>
-        <button className="button button--primary topbar__action" type="button">
-          Continue learning
+        <button
+          className="button button--primary topbar__action"
+          onClick={() => document.getElementById('lesson')?.scrollIntoView()}
+          type="button"
+        >
+          Resume topic
         </button>
       </header>
 
       <div className="learning-layout" id="top">
-        <CurriculumSidebar completedTopicIds={progress.completedTopicIds} />
-        <VectorLesson
-          isComplete={progress.completedTopicIds.includes(availableTopicId)}
-          onComplete={() => completeTopic(availableTopicId)}
-          onPracticeAttempt={recordPracticeAttempt}
+        <CurriculumSidebar
+          completedTopicIds={progress.completedTopicIds}
+          currentTopicId={progress.currentTopicId}
+          onSelectTopic={selectTopic}
         />
+        <div id="lesson">{renderCurrentLesson()}</div>
         <ProgressPanel
           completedTopics={progress.completedTopicIds.length}
           onReset={resetProgress}

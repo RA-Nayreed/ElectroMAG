@@ -36,6 +36,13 @@ export function useProgress() {
     }))
   }
 
+  function selectTopic(topicId: string) {
+    setProgress((currentProgress) => ({
+      ...currentProgress,
+      currentTopicId: topicId
+    }))
+  }
+
   function completeTopic(topicId: string) {
     setProgress((currentProgress) => {
       if (currentProgress.completedTopicIds.includes(topicId)) {
@@ -55,6 +62,7 @@ export function useProgress() {
 
   return {
     progress,
+    selectTopic,
     recordPracticeAttempt,
     completeTopic,
     resetProgress

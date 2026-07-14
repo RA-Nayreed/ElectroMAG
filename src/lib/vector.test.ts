@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { areVectorsClose, calculateMagnitude, normalizeVector, subtractVectors } from './vector'
+import {
+  areVectorsClose,
+  calculateCrossProduct,
+  calculateDotProduct,
+  calculateMagnitude,
+  normalizeVector,
+  subtractVectors
+} from './vector'
 
 describe('vector utilities', () => {
   it('constructs displacement as endpoint minus starting point', () => {
@@ -37,5 +44,23 @@ describe('vector utilities', () => {
         { x: 3, y: 4, z: 0 }
       )
     ).toBe(true)
+  })
+
+  it('calculates the dot product as a scalar', () => {
+    expect(
+      calculateDotProduct(
+        { x: 2, y: -1, z: 2 },
+        { x: 1, y: 2, z: 0 }
+      )
+    ).toBe(0)
+  })
+
+  it('calculates the oriented cross product', () => {
+    expect(
+      calculateCrossProduct(
+        { x: 2, y: -1, z: 2 },
+        { x: 1, y: 2, z: 0 }
+      )
+    ).toEqual({ x: -4, y: 2, z: 5 })
   })
 })

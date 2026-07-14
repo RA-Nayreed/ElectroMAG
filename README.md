@@ -11,10 +11,6 @@ The learning loop is:
 5. Receive mistake-specific feedback.
 6. Demonstrate mastery through transfer problems.
 
-## Current phase
-
-Phase 1 establishes the application shell, curriculum architecture, local progress model, equation rendering, editorial design system and the first vector lesson.
-
 ## Local development
 
 ```bash

@@ -232,7 +232,14 @@ p {
 .topic-link--active {
   background: var(--surface);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.035);
+}
+
+.topic-link--available {
   cursor: pointer;
+}
+
+.topic-link--available:not(.topic-link--active):hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .topic-link__number {
@@ -506,6 +513,182 @@ p {
   margin: 5px 0 0;
 }
 
+.product-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.product-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid var(--hairline);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.product-card::after {
+  position: absolute;
+  z-index: -1;
+  top: -90px;
+  right: -75px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  content: '';
+  filter: blur(3px);
+  opacity: 0.48;
+}
+
+.product-card--dot::after {
+  background: radial-gradient(circle, var(--mint), transparent 70%);
+}
+
+.product-card--cross::after {
+  background: radial-gradient(circle, var(--lavender), transparent 70%);
+}
+
+.product-card h2 {
+  max-width: 420px;
+  margin-bottom: 26px;
+  font-size: 34px;
+}
+
+.product-card ul {
+  display: grid;
+  gap: 9px;
+  margin: 18px 0 0;
+  padding-left: 20px;
+  color: var(--body);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.application-note {
+  margin: 24px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline);
+  color: var(--body);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.product-rule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  gap: 48px;
+  align-items: center;
+  margin-top: 22px;
+  padding: 36px;
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  background: var(--surface-strong);
+}
+
+.product-rule h2 {
+  margin-bottom: 0;
+  font-size: 32px;
+}
+
+.decision-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.decision-grid p {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--body);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.decision-grid strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ink);
+}
+
+.worked-products {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.worked-products article {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 22px;
+  padding: 26px;
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.worked-products__symbol {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  font-family: 'EB Garamond', serif;
+  font-size: 30px;
+}
+
+.worked-products h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.worked-products .equation--display {
+  margin: 5px 0;
+}
+
+.worked-products p,
+.order-warning p {
+  margin-bottom: 0;
+  color: var(--body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.order-warning {
+  margin-top: 18px;
+  padding: 24px 28px;
+  border: 1px solid rgba(244, 197, 168, 0.7);
+  border-radius: 18px;
+  background: rgba(244, 197, 168, 0.16);
+}
+
+.order-warning .equation--display {
+  margin: 4px 0;
+}
+
+.product-answer {
+  display: grid;
+  gap: 9px;
+}
+
+.product-answer + .product-answer {
+  margin-top: 20px;
+}
+
+.product-answer span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-answer input {
+  padding-left: 12px;
+}
+
 .practice-section {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(340px, 1fr);
@@ -745,7 +928,12 @@ p {
   }
 
   .lesson-section--split,
-  .practice-section {
+  .practice-section,
+  .product-rule {
+    grid-template-columns: 1fr;
+  }
+
+  .product-comparison {
     grid-template-columns: 1fr;
   }
 }

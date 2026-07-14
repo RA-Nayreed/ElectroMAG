@@ -1,4 +1,4 @@
-export type TopicStatus = 'available' | 'planned'
+export type TopicStatus = 'available' | 'upcoming'
 
 export interface Topic {
   id: string
