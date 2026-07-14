@@ -1494,31 +1494,6 @@ p {
   line-height: 1.25;
 }
 
-.practice-question__heading {
-  display: flex;
-  gap: 18px;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.stack-badge {
-  flex: 0 0 auto;
-  padding: 6px 9px;
-  border: 1px solid rgba(22, 122, 58, 0.35);
-  border-radius: 999px;
-  background: rgba(167, 229, 211, 0.2);
-  color: #115c30;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.button:disabled {
-  cursor: wait;
-  opacity: 0.62;
-}
-
 .choice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
