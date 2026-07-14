@@ -1,0 +1,35 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: goemaxima-rahti
+  namespace: electromag
+  labels:
+    app.kubernetes.io/name: maxima
+    app.kubernetes.io/part-of: electromag-stack
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: goemaxima-rahti
+  namespace: electromag
+  labels:
+    app.kubernetes.io/name: maxima
+    app.kubernetes.io/part-of: electromag-stack
+spec:
+  runPolicy: Serial
+  source:
+    type: Git
+    git:
+      uri: https://github.com/RA-Nayreed/ElectroMAG.git
+      ref: main
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: stack/goemaxima-rahti/Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: goemaxima-rahti:2026042200
+  triggers:
+    - type: ConfigChange
+
